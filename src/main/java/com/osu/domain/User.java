@@ -1,7 +1,15 @@
 package com.osu.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.*;
+import org.hibernate.annotations.Cache;
+
 import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by Ekaterina Pyataeva
@@ -9,13 +17,15 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "users")
-public class User implements Serializable {
+@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+public class User extends AbstractAuditingEntity implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false, updatable = false)
     private Long id;
-
 
     @Column(nullable = false)
     private String login;
@@ -24,8 +34,23 @@ public class User implements Serializable {
     private String password;
 
     @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private Role role;
+    private String firstName;
+
+    @Column(nullable = false)
+    private String lastName;
+
+    @Column(nullable = false)
+    private String email;
+
+    @JsonIgnore
+    @ManyToMany
+    @JoinTable(
+            name = "user_authority",
+            joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
+            inverseJoinColumns = {@JoinColumn(name = "authority_name", referencedColumnName = "name")})
+    @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+    @BatchSize(size = 20)
+    private Set<Authority> authorities = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -51,11 +76,36 @@ public class User implements Serializable {
         this.password = password;
     }
 
-    public Role getRole() {
-        return role;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setRole(Role role) {
-        this.role = role;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public Set<Authority> getAuthorities() {
+        return authorities;
+    }
+
+    public void setAuthorities(Set<Authority> authorities) {
+        this.authorities = authorities;
+    }
+
 }
