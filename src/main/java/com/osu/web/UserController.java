@@ -1,6 +1,5 @@
 package com.osu.web;
 
-import com.osu.domain.CurrentUser;
 import com.osu.domain.User;
 import com.osu.domain.UserCreateForm;
 import com.osu.service.UserService;
@@ -45,25 +44,7 @@ public class UserController {
         return "userCreate";
     }
 
-    @RequestMapping(value = PATH_CREATE, method = RequestMethod.POST)
-    public String handleUserCreateForm(@Valid @ModelAttribute("form") UserCreateForm form, BindingResult bindingResult) {
-        LOGGER.debug("Processing user create form={}, bindingResult={}", form, bindingResult);
-        if (bindingResult.hasErrors()) {
-            return "userCreate";
-        }
-        try {
-            User user = userService.create(form);
-            CurrentUser currentUser = new CurrentUser(user);
-            Authentication auth =
-                    new UsernamePasswordAuthenticationToken(currentUser, null, currentUser.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(auth);
-        } catch (DataIntegrityViolationException e) {
-            LOGGER.warn("Exception occurred when trying to save the user, assuming duplicate email", e);
-            bindingResult.reject("email.exists", "Email already exists");
-            return "userCreate";
-        }
-        return "redirect:/";
-    }
+
 
     @RequestMapping(PATH_ROOT)
     @Secured("ROLE_ADMIN")

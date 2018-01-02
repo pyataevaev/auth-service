@@ -3,7 +3,6 @@ package com.osu.service;
 import com.osu.domain.User;
 import com.osu.domain.UserCreateForm;
 import com.osu.repository.UserRepository;
-import com.osu.util.SecurityHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,14 +33,6 @@ public class UserService {
         return userRepository.findOne(id);
     }
 
-    @Transactional(readOnly = true)
-    public User getCurrentUser(){
-        User user = SecurityHelper.getCurrentUser();
-        if (user == null){
-            return null;
-        }
-        return getUserById(user.getId());
-    }
     public User getUserByLogin(String login) {
         log.debug("Getting user by name ={}", login);
         return userRepository.findByLogin(login);
