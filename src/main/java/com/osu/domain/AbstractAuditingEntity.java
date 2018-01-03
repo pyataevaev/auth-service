@@ -5,11 +5,9 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.Column;
-import javax.persistence.EntityListeners;
-import javax.persistence.MappedSuperclass;
+import javax.persistence.*;
 import java.io.Serializable;
-import java.time.Instant;
+import java.util.Date;
 
 /**
  * Created by Ekaterina Pyataeva
@@ -23,26 +21,28 @@ public abstract class AbstractAuditingEntity implements Serializable {
     @CreatedDate
     @Column(name = "created_date", nullable = false)
     @JsonIgnore
-    private Instant createdDate = Instant.now();
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdDate = new Date();
 
     @LastModifiedDate
     @Column(name = "last_modified_date")
     @JsonIgnore
-    private Instant lastModifiedDate = Instant.now();
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date lastModifiedDate = new Date();
 
-    public Instant getCreatedDate() {
+    public Date getCreatedDate() {
         return createdDate;
     }
 
-    public void setCreatedDate(Instant createdDate) {
+    public void setCreatedDate(Date createdDate) {
         this.createdDate = createdDate;
     }
 
-    public Instant getLastModifiedDate() {
+    public Date getLastModifiedDate() {
         return lastModifiedDate;
     }
 
-    public void setLastModifiedDate(Instant lastModifiedDate) {
+    public void setLastModifiedDate(Date lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
     }
 }

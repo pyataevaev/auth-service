@@ -3,7 +3,7 @@ package com.osu.web.rest.vm;
 import com.osu.service.dto.UserDTO;
 
 import javax.validation.constraints.Size;
-import java.time.Instant;
+import java.util.Date;
 import java.util.Set;
 
 /**
@@ -23,7 +23,7 @@ public class ManagedUserVM extends UserDTO {
     }
 
     public ManagedUserVM(Long id, String login, String password, String firstName, String lastName,
-                         String email, Instant createdDate, Instant lastModifiedDate,
+                         String email, Date createdDate, Date lastModifiedDate,
                          Set<String> authorities) {
 
         super(id, login, firstName, lastName, email, createdDate, lastModifiedDate,  authorities);

@@ -18,13 +18,15 @@ import java.util.Set;
  */
 
 @Entity
-@Table(name = "user")
+@Table(name = "users")
 public class User extends AbstractAuditingEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SequenceGenerator( name = "baseSeq", sequenceName = "base_seq", allocationSize = 1, initialValue = 5)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "baseSeq")
+    @Column(name = "id")
     private Long id;
 
     @NotNull
@@ -52,7 +54,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
     private String email;
 
     @JsonIgnore
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "user_authority",
             joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},

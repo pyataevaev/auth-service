@@ -8,7 +8,7 @@ import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
-import java.time.Instant;
+import java.util.Date;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -34,9 +34,9 @@ public class UserDTO {
     @Size(min = 5, max = 100)
     private String email;
 
-    private Instant createdDate;
+    private Date createdDate;
 
-    private Instant lastModifiedDate;
+    private Date lastModifiedDate;
 
     private Set<String> authorities;
 
@@ -52,7 +52,7 @@ public class UserDTO {
     }
 
     public UserDTO(Long id, String login, String firstName, String lastName,
-                   String email, Instant createdDate, Instant lastModifiedDate,
+                   String email, Date createdDate, Date lastModifiedDate,
                    Set<String> authorities) {
 
         this.id = id;
@@ -93,15 +93,19 @@ public class UserDTO {
         return email;
     }
 
-    public Instant getCreatedDate() {
+    public Date getCreatedDate() {
         return createdDate;
     }
 
-    public Instant getLastModifiedDate() {
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public Date getLastModifiedDate() {
         return lastModifiedDate;
     }
 
-    public void setLastModifiedDate(Instant lastModifiedDate) {
+    public void setLastModifiedDate(Date lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
     }
 

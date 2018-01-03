@@ -34,8 +34,9 @@ public class UserService {
     }
 
     public User getUserByLogin(String login) {
-        log.debug("Getting user by name ={}", login);
-        return userRepository.findByLogin(login);
+       //log.debug("Getting user by name ={}", login);
+       // return userRepository.findByLogin(login);
+        return null;
     }
 
     public List<User> getAllUsers() {

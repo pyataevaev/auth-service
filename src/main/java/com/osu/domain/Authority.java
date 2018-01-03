@@ -1,12 +1,10 @@
 package com.osu.domain;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.util.Set;
 
 /**
  * Created by Ekaterina Pyataeva
@@ -23,12 +21,23 @@ public class Authority implements Serializable {
     @Column(length = 50)
     private String name;
 
+    @ManyToMany(mappedBy = "authorities", fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.REMOVE}, targetEntity = User.class)
+    private Set<User> users;
+
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Set<User> getUsers() {
+        return users;
+    }
+
+    public void setUsers(Set<User> users) {
+        this.users = users;
     }
 
     @Override

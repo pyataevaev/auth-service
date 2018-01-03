@@ -6,9 +6,14 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
                         http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
+    <changeSet id="add sequence" author="Ekaterina Pyataeva">
+        <createSequence sequenceName="base_seq" cycle="false" minValue="5" startValue="5" incrementBy="1"/>
+    </changeSet>
+
     <changeSet id="1" author="Ekaterina Pyataeva">
-        <createTable tableName="user">
-            <column name="id" type="bigint" autoIncrement="true">
+
+        <createTable tableName="users">
+            <column name="id" type="bigint" defaultValueComputed="nextval('base_seq')">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="login" type="varchar(50)">
@@ -26,13 +31,13 @@
             <column name="last_modified_date" type="timestamp"/>
         </createTable>
         <createIndex indexName="idx_user_login"
-                     tableName="user"
+                     tableName="users"
                      unique="true">
             <column name="login" type="varchar(50)"/>
         </createIndex>
 
         <createIndex indexName="idx_user_email"
-                     tableName="user"
+                     tableName="users"
                      unique="true">
             <column name="email" type="varchar(100)"/>
         </createIndex>
@@ -63,16 +68,16 @@
                                  baseTableName="user_authority"
                                  constraintName="fk_user_id"
                                  referencedColumnNames="id"
-                                 referencedTableName="user"/>
+                                 referencedTableName="users"/>
     </changeSet>
     <changeSet id="insert users" author="Ekaterina Pyataeva">
         <loadData encoding="UTF-8"
                   file="config/liquibase/users.csv"
                   separator=";"
-                  tableName="user">
+                  tableName="users">
             <column name="created_date" type="timestamp"/>
         </loadData>
-        <dropDefaultValue tableName="user" columnName="created_date" columnDataType="datetime"/>
+        <dropDefaultValue tableName="users" columnName="created_date" columnDataType="datetime"/>
     </changeSet>
 
     <changeSet id="insert authorities" author="Ekaterina Pyataeva">
