@@ -6,9 +6,6 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
                         http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
-    <property name="now" value="now()" dbms="h2"/>
-    <property name="now" value="now()" dbms="postgresql"/>
-
     <changeSet id="1" author="Ekaterina Pyataeva">
         <createTable tableName="user">
             <column name="id" type="bigint" autoIncrement="true">
@@ -67,6 +64,8 @@
                                  constraintName="fk_user_id"
                                  referencedColumnNames="id"
                                  referencedTableName="user"/>
+    </changeSet>
+    <changeSet id="insert users" author="Ekaterina Pyataeva">
         <loadData encoding="UTF-8"
                   file="config/liquibase/users.csv"
                   separator=";"
@@ -74,28 +73,20 @@
             <column name="created_date" type="timestamp"/>
         </loadData>
         <dropDefaultValue tableName="user" columnName="created_date" columnDataType="datetime"/>
+    </changeSet>
 
+    <changeSet id="insert authorities" author="Ekaterina Pyataeva">
         <loadData encoding="UTF-8"
                   file="config/liquibase/authorities.csv"
                   separator=";"
                   tableName="authority"/>
+    </changeSet>
 
+    <changeSet id="insert users_authorities" author="Ekaterina Pyataeva">
         <loadData encoding="UTF-8"
                   file="config/liquibase/users_authorities.csv"
                   separator=";"
                   tableName="user_authority"/>
-
-        <createTable tableName="persistent_audit_event">
-            <column name="event_id" type="bigint" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="principal" type="varchar(50)">
-                <constraints nullable="false" />
-            </column>
-            <column name="event_date" type="timestamp"/>
-            <column name="event_type" type="varchar(255)"/>
-        </createTable>
-
     </changeSet>
 
 </databaseChangeLog>
