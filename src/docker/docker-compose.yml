@@ -1,0 +1,16 @@
+version: '2'
+services:
+  app:
+    image: ekaterinach/auth
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mypostgres
+  mypostgres:
+    image: ekaterinach/postgrev10
+    ports:
+      - "5432:5432"
+  client:
+    image: ekaterinach/client
+    ports:
+      - "4200:4200"
