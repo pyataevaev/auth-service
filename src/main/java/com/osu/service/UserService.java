@@ -1,17 +1,22 @@
 package com.osu.service;
 
+import com.osu.domain.Authority;
 import com.osu.domain.User;
-import com.osu.domain.UserCreateForm;
+import com.osu.repository.AuthorityRepository;
 import com.osu.repository.UserRepository;
+import com.osu.security.AuthoritiesConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by Ekaterina Pyataeva
@@ -22,10 +27,14 @@ public class UserService {
     private static final Logger log = LoggerFactory.getLogger(UserService.class);
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final AuthorityRepository authorityRepository;
 
     @Autowired
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthorityRepository authorityRepository) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.authorityRepository = authorityRepository;
     }
 
     public User getUserById(long id) {
@@ -48,12 +57,22 @@ public class UserService {
         return users;
     }
 
-    public User create(UserCreateForm form) {
-        log.debug("Creating new user");
-        User user = new User();
-        user.setLogin(form.getLogin());
-        user.setPassword(new BCryptPasswordEncoder().encode(form.getPassword()));
-        return userRepository.save(user);
+    public User createUser(String login, String password, String firstName, String lastName, String email) {
+        User newUser = new User();
+        Authority authority = authorityRepository.findOne(AuthoritiesConstants.USER);
+        Set<Authority> authorities = new HashSet<>();
+        String encryptedPassword = passwordEncoder.encode(password);
+        newUser.setLogin(login);
+        // new user gets initially a generated password
+        newUser.setPassword(encryptedPassword);
+        newUser.setFirstName(firstName);
+        newUser.setLastName(lastName);
+        newUser.setEmail(email);
+        authorities.add(authority);
+        newUser.setAuthorities(authorities);
+        userRepository.save(newUser);
+        log.debug("Created Information for User: {}", newUser);
+        return newUser;
     }
 
     public User save(User user) {
