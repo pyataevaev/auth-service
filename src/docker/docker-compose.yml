@@ -7,10 +7,10 @@ services:
     depends_on:
       - mypostgres
   mypostgres:
-    image: ekaterinach/postgrev10
+    image: ekaterinach/postgrestest
     ports:
       - "5432:5432"
   client:
     image: ekaterinach/client
     ports:
-      - "4200:4200"
+      - "4200:80"
