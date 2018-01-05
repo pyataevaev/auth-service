@@ -1,7 +1,7 @@
 version: '2'
 services:
   app:
-    image: ekaterinach/auth
+    image: auth1
     ports:
       - "8080:8080"
     depends_on:

@@ -6,14 +6,11 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
                         http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
-    <changeSet id="add sequence" author="Ekaterina Pyataeva">
-        <createSequence sequenceName="base_seq" cycle="false" minValue="5" startValue="5" incrementBy="1"/>
-    </changeSet>
 
     <changeSet id="1" author="Ekaterina Pyataeva">
 
         <createTable tableName="users">
-            <column name="id" type="bigint" defaultValueComputed="nextval('base_seq')">
+            <column name="id" type="bigint">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="login" type="varchar(50)">
@@ -29,6 +26,7 @@
                 <constraints nullable="false"/>
             </column>
             <column name="last_modified_date" type="timestamp"/>
+            <column name="group_id" type="bigint"/>
         </createTable>
         <createIndex indexName="idx_user_login"
                      tableName="users"
@@ -70,6 +68,54 @@
                                  referencedColumnNames="id"
                                  referencedTableName="users"/>
     </changeSet>
+
+    <changeSet id="add groups table" author="Ekaterina Pyataeva">
+        <createTable tableName="groups">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="faculty_id" type="bigint"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="add faculty table" author="Ekaterina Pyataeva">
+        <createTable tableName="faculty">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(256)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="add constraints" author="Ekaterina Pyataeva">
+        <addForeignKeyConstraint baseColumnNames="group_id"
+                                 baseTableName="users"
+                                 constraintName="fk_user_group_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="groups"/>
+
+
+        <addForeignKeyConstraint baseColumnNames="faculty_id"
+                                 baseTableName="groups"
+                                 constraintName="fk_user_faculty_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="faculty"/>
+    </changeSet>
+
+    <changeSet id="fill tables" author="Ekaterina Pyataeva">
+        <sql>
+            INSERT INTO faculty (id, name) VALUES (7, 'Факультет математики и информационных технологий');
+            INSERT INTO faculty (id, name) VALUES (8, 'Физический факультет');
+            INSERT INTO groups (id, name, faculty_id) VALUES (5, '12КБ', 7);
+            INSERT INTO groups (id, name, faculty_id) VALUES (6, '13КБ', 7);
+        </sql>
+    </changeSet>
+
     <changeSet id="insert users" author="Ekaterina Pyataeva">
         <loadData encoding="UTF-8"
                   file="config/liquibase/users.csv"
@@ -92,6 +138,17 @@
                   file="config/liquibase/users_authorities.csv"
                   separator=";"
                   tableName="user_authority"/>
+    </changeSet>
+
+    <changeSet id="add hibernate_sequence" author="Ekaterina Pyataeva">
+        <sql>
+            CREATE SEQUENCE public.hibernate_sequence
+            INCREMENT 1
+            MINVALUE 1
+            MAXVALUE 9223372036854775807
+            START 31
+            CACHE 1;
+        </sql>
     </changeSet>
 
 </databaseChangeLog>

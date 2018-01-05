@@ -24,8 +24,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @SequenceGenerator( name = "baseSeq", sequenceName = "base_seq", allocationSize = 1, initialValue = 5)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "baseSeq")
+    @GeneratedValue
     @Column(name = "id")
     private Long id;
 
@@ -61,6 +60,10 @@ public class User extends AbstractAuditingEntity implements Serializable {
             inverseJoinColumns = {@JoinColumn(name = "authority_name", referencedColumnName = "name")})
     @BatchSize(size = 20)
     private Set<Authority> authorities = new HashSet<>();
+
+    @ManyToOne
+    @JoinColumn(name = "group_id", nullable = false)
+    private Group group;
 
     public Long getId() {
         return id;
@@ -118,4 +121,11 @@ public class User extends AbstractAuditingEntity implements Serializable {
         this.authorities = authorities;
     }
 
+    public Group getGroup() {
+        return group;
+    }
+
+    public void setGroup(Group group) {
+        this.group = group;
+    }
 }

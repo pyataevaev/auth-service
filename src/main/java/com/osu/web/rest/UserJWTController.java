@@ -1,11 +1,13 @@
 package com.osu.web.rest;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.osu.domain.Logs;
+import com.osu.domain.Faculty;
+import com.osu.domain.Group;
+import com.osu.repository.FacultyRepository;
+import com.osu.repository.GroupRepository;
 import com.osu.security.jwt.JWTConfigurer;
 import com.osu.security.jwt.TokenProvider;
 import com.osu.service.LogsService;
-import com.osu.util.LogsUtil;
 import com.osu.web.rest.vm.LoginVM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
