@@ -39,12 +39,6 @@ public class AccountResource {
         this.logsService = logsService;
     }
 
-    @PostMapping(path = "/register1", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
-    public ResponseEntity<String> getAllGroups( @RequestBody ManagedUserVM managedUserVM) {
-        return new ResponseEntity<>("21", HttpStatus.OK);
-    }
-
-
     @PostMapping(path = "/register", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
     public ResponseEntity registerAccount(@Valid @RequestBody ManagedUserVM managedUserVM) {
         logsService.save("registration attempt : " + managedUserVM.toString());
