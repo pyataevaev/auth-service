@@ -1,8 +1,11 @@
 package com.osu.web.rest;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.osu.domain.Logs;
+import com.osu.repository.LogsRepository;
 import com.osu.security.jwt.JWTConfigurer;
 import com.osu.security.jwt.TokenProvider;
+import com.osu.service.NextSequenceService;
 import com.osu.web.rest.vm.LoginVM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,13 +36,22 @@ public class UserJWTController {
 
     private final AuthenticationManager authenticationManager;
 
-    public UserJWTController(TokenProvider tokenProvider, AuthenticationManager authenticationManager) {
+    private final LogsRepository logsRepository;
+
+    private final NextSequenceService nextSequenceService;
+
+    public UserJWTController(TokenProvider tokenProvider, AuthenticationManager authenticationManager, LogsRepository logsRepository, NextSequenceService nextSequenceService) {
         this.tokenProvider = tokenProvider;
         this.authenticationManager = authenticationManager;
+        this.logsRepository = logsRepository;
+        this.nextSequenceService = nextSequenceService;
     }
 
     @PostMapping("/authenticate")
     public ResponseEntity authorize(@Valid @RequestBody LoginVM loginVM, HttpServletResponse response) {
+        Logs logs = new Logs("authenticate request", "authenticate");
+        logs.setId(nextSequenceService.getNextSequence("customSequences"));
+        logsRepository.save(logs);
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(loginVM.getUsername(), loginVM.getPassword());
         try {
