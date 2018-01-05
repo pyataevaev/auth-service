@@ -1,8 +1,10 @@
 package com.osu.service;
 
 import com.osu.domain.Authority;
+import com.osu.domain.Group;
 import com.osu.domain.User;
 import com.osu.repository.AuthorityRepository;
+import com.osu.repository.GroupRepository;
 import com.osu.repository.UserRepository;
 import com.osu.security.AuthoritiesConstants;
 import org.slf4j.Logger;
@@ -29,12 +31,14 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthorityRepository authorityRepository;
+    private final GroupRepository groupRepository;
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthorityRepository authorityRepository) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthorityRepository authorityRepository, GroupRepository groupRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authorityRepository = authorityRepository;
+        this.groupRepository = groupRepository;
     }
 
     public User getUserById(long id) {
@@ -57,7 +61,7 @@ public class UserService {
         return users;
     }
 
-    public User createUser(String login, String password, String firstName, String lastName, String email) {
+    public User createUser(String login, String password, String firstName, String lastName, String email, long groupId) {
         User newUser = new User();
         Authority authority = authorityRepository.findOne(AuthoritiesConstants.USER);
         Set<Authority> authorities = new HashSet<>();
@@ -70,6 +74,8 @@ public class UserService {
         newUser.setEmail(email);
         authorities.add(authority);
         newUser.setAuthorities(authorities);
+        Group group = groupRepository.findOne(groupId);
+        newUser.setGroup(group);
         userRepository.save(newUser);
         log.debug("Created Information for User: {}", newUser);
         return newUser;

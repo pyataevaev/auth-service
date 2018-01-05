@@ -40,6 +40,8 @@ public class UserDTO {
 
     private Set<String> authorities;
 
+    private long groupId;
+
     public UserDTO() {
         // Empty constructor needed for Jackson.
     }
@@ -111,6 +113,14 @@ public class UserDTO {
 
     public Set<String> getAuthorities() {
         return authorities;
+    }
+
+    public long getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(long groupId) {
+        this.groupId = groupId;
     }
 
     @Override

@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * Created by Ekaterina Pyataeva
@@ -38,6 +39,11 @@ public class AccountResource {
         this.logsService = logsService;
     }
 
+    @PostMapping(path = "/register1", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
+    public ResponseEntity<String> getAllGroups( @RequestBody ManagedUserVM managedUserVM) {
+        return new ResponseEntity<>("21", HttpStatus.OK);
+    }
+
 
     @PostMapping(path = "/register", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
     public ResponseEntity registerAccount(@Valid @RequestBody ManagedUserVM managedUserVM) {
@@ -56,7 +62,7 @@ public class AccountResource {
                             User user = userService
                                     .createUser(managedUserVM.getLogin(), managedUserVM.getPassword(),
                                             managedUserVM.getFirstName(), managedUserVM.getLastName(),
-                                            managedUserVM.getEmail().toLowerCase());
+                                            managedUserVM.getEmail().toLowerCase(), managedUserVM.getGroupId());
                             logsService.save("successful registration : " + managedUserVM.toString());
                             return new ResponseEntity<>(HttpStatus.CREATED);
                         })
