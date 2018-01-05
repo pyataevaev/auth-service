@@ -14,3 +14,7 @@ services:
     image: ekaterinach/client
     ports:
       - "4200:80"
+  mongodb:
+    image: mongo
+    ports:
+      - "27017:27017"

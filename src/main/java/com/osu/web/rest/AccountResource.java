@@ -2,6 +2,7 @@ package com.osu.web.rest;
 
 import com.osu.domain.User;
 import com.osu.repository.UserRepository;
+import com.osu.service.LogsService;
 import com.osu.service.UserService;
 import com.osu.web.rest.vm.ManagedUserVM;
 import org.apache.commons.lang3.StringUtils;
@@ -27,21 +28,24 @@ public class AccountResource {
 
     private final UserRepository userRepository;
     private final UserService userService;
+    private final LogsService logsService;
 
     private static final String CHECK_ERROR_MESSAGE = "Incorrect password";
 
-    public AccountResource(UserRepository userRepository, UserService userService) {
+    public AccountResource(UserRepository userRepository, UserService userService, LogsService logsService) {
         this.userRepository = userRepository;
         this.userService = userService;
+        this.logsService = logsService;
     }
 
 
-    @PostMapping(path = "/register", produces={MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
+    @PostMapping(path = "/register", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
     public ResponseEntity registerAccount(@Valid @RequestBody ManagedUserVM managedUserVM) {
-
+        logsService.save("registration attempt : " + managedUserVM.toString());
         HttpHeaders textPlainHeaders = new HttpHeaders();
         textPlainHeaders.setContentType(MediaType.TEXT_PLAIN);
         if (!checkPasswordLength(managedUserVM.getPassword())) {
+            logsService.save("registration error (incorrect password length): " + managedUserVM.toString());
             return new ResponseEntity<>(CHECK_ERROR_MESSAGE, HttpStatus.BAD_REQUEST);
         }
         return userRepository.findOneByLogin(managedUserVM.getLogin().toLowerCase())
@@ -53,11 +57,11 @@ public class AccountResource {
                                     .createUser(managedUserVM.getLogin(), managedUserVM.getPassword(),
                                             managedUserVM.getFirstName(), managedUserVM.getLastName(),
                                             managedUserVM.getEmail().toLowerCase());
+                            logsService.save("successful registration : " + managedUserVM.toString());
                             return new ResponseEntity<>(HttpStatus.CREATED);
                         })
                 );
     }
-
 
     private boolean checkPasswordLength(String password) {
         return !StringUtils.isEmpty(password) &&

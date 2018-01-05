@@ -16,13 +16,13 @@ public class Logs {
 
     private Date date = new Date();
 
-    private String details;
-
     private String type;
 
-    public Logs(String details, String type) {
-        this.details = details;
+    private String details;
+
+    public Logs(String type, String details) {
         this.type = type;
+        this.details = details;
     }
 
     public long getId() {

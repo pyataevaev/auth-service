@@ -2,10 +2,10 @@ package com.osu.web.rest;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.osu.domain.Logs;
-import com.osu.repository.LogsRepository;
 import com.osu.security.jwt.JWTConfigurer;
 import com.osu.security.jwt.TokenProvider;
-import com.osu.service.NextSequenceService;
+import com.osu.service.LogsService;
+import com.osu.util.LogsUtil;
 import com.osu.web.rest.vm.LoginVM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,25 +33,18 @@ public class UserJWTController {
     private final Logger log = LoggerFactory.getLogger(UserJWTController.class);
 
     private final TokenProvider tokenProvider;
-
     private final AuthenticationManager authenticationManager;
+    private final LogsService logsService;
 
-    private final LogsRepository logsRepository;
-
-    private final NextSequenceService nextSequenceService;
-
-    public UserJWTController(TokenProvider tokenProvider, AuthenticationManager authenticationManager, LogsRepository logsRepository, NextSequenceService nextSequenceService) {
+    public UserJWTController(TokenProvider tokenProvider, AuthenticationManager authenticationManager, LogsService logsService) {
         this.tokenProvider = tokenProvider;
         this.authenticationManager = authenticationManager;
-        this.logsRepository = logsRepository;
-        this.nextSequenceService = nextSequenceService;
+        this.logsService = logsService;
     }
 
     @PostMapping("/authenticate")
     public ResponseEntity authorize(@Valid @RequestBody LoginVM loginVM, HttpServletResponse response) {
-        Logs logs = new Logs("authenticate request", "authenticate");
-        logs.setId(nextSequenceService.getNextSequence("customSequences"));
-        logsRepository.save(logs);
+        logsService.save("authorization attempt : " + loginVM.toString());
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(loginVM.getUsername(), loginVM.getPassword());
         try {
@@ -60,8 +53,10 @@ public class UserJWTController {
             boolean rememberMe = (loginVM.isRememberMe() == null) ? false : loginVM.isRememberMe();
             String jwt = tokenProvider.createToken(authentication, rememberMe);
             response.addHeader(JWTConfigurer.AUTHORIZATION_HEADER, "Bearer " + jwt);
+            logsService.save("success authorization : " + loginVM.toString());
             return ResponseEntity.ok(new JWTToken(jwt));
         } catch (AuthenticationException ae) {
+            logsService.save("authorization exception : " + loginVM.toString());
             log.trace("Authentication exception trace: {}", ae);
             return new ResponseEntity<>(Collections.singletonMap("AuthenticationException",
                     ae.getLocalizedMessage()), HttpStatus.UNAUTHORIZED);
