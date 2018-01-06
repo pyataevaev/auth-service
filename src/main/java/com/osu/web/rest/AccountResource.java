@@ -2,8 +2,11 @@ package com.osu.web.rest;
 
 import com.osu.domain.User;
 import com.osu.repository.UserRepository;
+import com.osu.security.SecurityUtil;
 import com.osu.service.LogsService;
 import com.osu.service.UserService;
+import com.osu.service.dto.UserDTO;
+import com.osu.web.rest.util.HeaderUtil;
 import com.osu.web.rest.vm.ManagedUserVM;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -15,7 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by Ekaterina Pyataeva
@@ -61,6 +64,39 @@ public class AccountResource {
                             return new ResponseEntity<>(HttpStatus.CREATED);
                         })
                 );
+    }
+
+    @GetMapping("/account")
+    public ResponseEntity<UserDTO> getAccount() {
+        return Optional.ofNullable(userService.getUserWithAuthorities())
+                .map(user -> new ResponseEntity<>(new UserDTO(user), HttpStatus.OK))
+                .orElse(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
+    }
+
+    @PostMapping("/account")
+    public ResponseEntity saveAccount(@Valid @RequestBody UserDTO userDTO) {
+        final String userLogin = SecurityUtil.getCurrentUserLogin();
+        Optional<User> existingUser = userRepository.findOneByEmailIgnoreCase(userDTO.getEmail());
+        if (existingUser.isPresent() && (!existingUser.get().getLogin().equalsIgnoreCase(userLogin))) {
+            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("user-management", "emailexists", "Email already in use")).body(null);
+        }
+        return userRepository
+                .findOneByLogin(userLogin)
+                .map(u -> {
+                    userService.updateUser(userDTO.getFirstName(), userDTO.getLastName(), userDTO.getEmail());
+                    return new ResponseEntity(HttpStatus.OK);
+                })
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
+    }
+
+    @PostMapping(path = "/account/change-password",
+            produces = MediaType.TEXT_PLAIN_VALUE)
+    public ResponseEntity changePassword(@RequestBody String password) {
+        if (!checkPasswordLength(password)) {
+            return new ResponseEntity<>(CHECK_ERROR_MESSAGE, HttpStatus.BAD_REQUEST);
+        }
+        userService.changePassword(password);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     private boolean checkPasswordLength(String password) {
