@@ -1,16 +1,13 @@
 package com.osu.web.rest;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.osu.domain.Faculty;
-import com.osu.domain.Group;
-import com.osu.repository.FacultyRepository;
-import com.osu.repository.GroupRepository;
 import com.osu.security.jwt.JWTConfigurer;
 import com.osu.security.jwt.TokenProvider;
 import com.osu.service.LogsService;
 import com.osu.web.rest.vm.LoginVM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -37,16 +34,19 @@ public class UserJWTController {
     private final TokenProvider tokenProvider;
     private final AuthenticationManager authenticationManager;
     private final LogsService logsService;
+    private final RabbitTemplate rabbitTemplate;
 
-    public UserJWTController(TokenProvider tokenProvider, AuthenticationManager authenticationManager, LogsService logsService) {
+    public UserJWTController(TokenProvider tokenProvider, AuthenticationManager authenticationManager, LogsService logsService, RabbitTemplate rabbitTemplate) {
         this.tokenProvider = tokenProvider;
         this.authenticationManager = authenticationManager;
         this.logsService = logsService;
+        this.rabbitTemplate = rabbitTemplate;
     }
 
     @PostMapping("/authenticate")
     public ResponseEntity authorize(@Valid @RequestBody LoginVM loginVM, HttpServletResponse response) {
         logsService.save("authorization attempt : " + loginVM.toString());
+        sendMessage();
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(loginVM.getUsername(), loginVM.getPassword());
         try {
@@ -63,6 +63,10 @@ public class UserJWTController {
             return new ResponseEntity<>(Collections.singletonMap("AuthenticationException",
                     ae.getLocalizedMessage()), HttpStatus.UNAUTHORIZED);
         }
+    }
+
+    private void sendMessage() {
+        rabbitTemplate.convertAndSend("spring-boot", "Hello from RabbitMQ AUTH!");
     }
 
     /**

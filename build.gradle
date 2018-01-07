@@ -67,6 +67,7 @@ dependencies {
     compile('org.postgresql:postgresql:9.4-1212-jdbc41')
     compile group: 'org.postgresql', name: 'postgresql', version: '9.4.1212'
     compile ('org.springframework.boot:spring-boot-starter-data-mongodb')
+    compile("org.springframework.boot:spring-boot-starter-amqp")
     runtime("org.hsqldb:hsqldb")
     testCompile("org.springframework.boot:spring-boot-starter-test")
     testCompile("com.jayway.jsonpath:json-path:2.0.0")
