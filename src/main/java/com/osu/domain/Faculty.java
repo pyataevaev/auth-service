@@ -1,5 +1,7 @@
 package com.osu.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -22,6 +24,7 @@ public class Faculty implements Serializable {
     @Column(nullable = false)
     private String name;
 
+    @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "faculty")
     private List<Group> groups = new ArrayList<>();
 

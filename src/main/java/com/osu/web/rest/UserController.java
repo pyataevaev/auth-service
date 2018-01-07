@@ -3,6 +3,7 @@ package com.osu.web.rest;
 import com.osu.config.Constants;
 import com.osu.domain.User;
 import com.osu.repository.UserRepository;
+import com.osu.security.AuthoritiesConstants;
 import com.osu.service.UserService;
 import com.osu.service.dto.UserDTO;
 import com.osu.web.rest.util.HeaderUtil;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -38,12 +40,6 @@ public class UserController {
 
     private final Logger log = LoggerFactory.getLogger(UserController.class);
 
-    protected static final String PATH_ROOT = "/users";
-    protected static final String PATH_CREATE = "/user/create";
-    protected static final String PATH_SAVE = "/users/save";
-    protected static final String PATH_GET = "users/get/{userId}";
-    protected static final String PATH_DELETE = "/users/delete/{userId}";
-
     private final UserService userService;
     private final UserRepository userRepository;
 
@@ -54,7 +50,7 @@ public class UserController {
     }
 
     @PostMapping("/users")
-    //@Secured(AuthoritiesConstants.ADMIN)
+    @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity createUser(@Valid @RequestBody ManagedUserVM managedUserVM) throws URISyntaxException {
         log.debug("REST request to save User : {}", managedUserVM);
 
@@ -81,7 +77,7 @@ public class UserController {
     }
 
     @PutMapping("/users")
-    //@Secured(AuthoritiesConstants.ADMIN)
+    @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<UserDTO> updateUser(@Valid @RequestBody ManagedUserVM managedUserVM) {
         log.debug("REST request to update User : {}", managedUserVM);
         Optional<User> existingUser = userRepository.findOneByEmailIgnoreCase(managedUserVM.getEmail());
@@ -106,7 +102,7 @@ public class UserController {
     }
 
     @GetMapping("/users/authorities")
-    //@Secured(AuthoritiesConstants.ADMIN)
+    @Secured(AuthoritiesConstants.ADMIN)
     public List<String> getAuthorities() {
         return userService.getAuthorities();
     }
@@ -120,7 +116,7 @@ public class UserController {
     }
 
     @DeleteMapping("/users/{login:" + Constants.LOGIN_REGEX + "}")
-    //@Secured(AuthoritiesConstants.ADMIN)
+    @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<Void> deleteUser(@PathVariable String login) {
         log.debug("REST request to delete User: {}", login);
         userService.deleteUser(login);

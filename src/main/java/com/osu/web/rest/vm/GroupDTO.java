@@ -1,5 +1,6 @@
 package com.osu.web.rest.vm;
 
+import com.osu.domain.Faculty;
 import com.osu.domain.Group;
 
 /**
@@ -10,6 +11,8 @@ public class GroupDTO {
     private long id;
 
     private String name;
+
+    private Faculty faculty;
 
     public long getId() {
         return id;
@@ -28,11 +31,20 @@ public class GroupDTO {
     }
 
     public GroupDTO(Group group) {
-        this(group.getId(), group.getName());
+        this(group.getId(), group.getName(), group.getFaculty());
     }
 
-    public GroupDTO(Long id, String name) {
+    public Faculty getFaculty() {
+        return faculty;
+    }
+
+    public void setFaculty(Faculty faculty) {
+        this.faculty = faculty;
+    }
+
+    public GroupDTO(long id, String name, Faculty faculty) {
         this.id = id;
         this.name = name;
+        this.faculty = faculty;
     }
 }
